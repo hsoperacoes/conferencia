@@ -85,43 +85,6 @@
                         });
                     }
 
-                    // Criar a tabela de preços para todas as coleções
-                    function criarTabelaPreco() {
-                        let tabelaHTML = `<h3>Tabela de Preços por Coleção</h3><table><thead><tr><th>Referência</th>`;
-
-                        // Cabeçalho com os nomes das coleções
-                        colecoes.forEach(colecao => {
-                            tabelaHTML += `<th>${colecao.nome}</th>`;
-                        });
-                        tabelaHTML += `</tr></thead><tbody>`;
-
-                        // Encontrar todas as referências únicas de produtos
-                        const referencias = [];
-                        colecoes.forEach(colecao => {
-                            colecao.dados.forEach(item => {
-                                if (!referencias.includes(item.referencia)) {
-                                    referencias.push(item.referencia);
-                                }
-                            });
-                        });
-
-                        // Preencher a tabela com os preços
-                        referencias.forEach(referencia => {
-                            tabelaHTML += `<tr><td>${referencia}</td>`;
-
-                            colecoes.forEach(colecao => {
-                                const item = colecao.dados.find(d => d.referencia === referencia);
-                                const preco = item ? item.preco : '0';
-                                tabelaHTML += `<td>${preco}</td>`;
-                            });
-
-                            tabelaHTML += `</tr>`;
-                        });
-
-                        tabelaHTML += `</tbody></table>`;
-                        document.getElementById("tabelas").innerHTML = tabelaHTML;
-                    }
-
                     // Comparar os preços das duas coleções selecionadas
                     function compararColecoes() {
                         const colecao1Index = document.getElementById("colecao1").value;
@@ -196,7 +159,6 @@
 
                     // Chama as funções ao carregar a página
                     atualizarSelecaoColecoes();
-                    criarTabelaPreco();
                 } else {
                     console.error("Não há dados ou os dados estão em formato inesperado.");
                 }
