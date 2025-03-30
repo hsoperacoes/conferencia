@@ -104,8 +104,8 @@
                         colecao1.forEach(item1 => {
                             const item2 = colecao2.find(item => item.referencia === item1.referencia);
                             if (item2) {
-                                const preco1 = parseFloat(item1.preco) || 0;
-                                const preco2 = parseFloat(item2.preco) || 0;
+                                const preco1 = parseFloat(item1.preco.replace(',', '.')) || 0;
+                                const preco2 = parseFloat(item2.preco.replace(',', '.')) || 0;
                                 const maiorPreco = Math.max(preco1, preco2).toFixed(2);
                                 const alteracao = preco1 !== preco2 ? 'Sim' : 'Não';
 
