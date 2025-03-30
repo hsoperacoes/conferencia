@@ -1,140 +1,141 @@
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulários</title>
+    <title>Comparação de Preços - Coleções</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #000; /* Fundo preto */
-            color: #fff; /* Texto branco para contraste */
-            margin: 0;
-            padding: 20px;
+            margin: 20px;
         }
-        h1 {
-            text-align: center;
-            color: #fff; /* Cor do título em branco */
-        }
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #333; /* Cor do fundo da caixa */
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .form-link {
-            display: block;
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            margin: 10px 0;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        .form-link:hover {
-            background-color: #45a049;
-        }
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #fff;
-            background-color: #333;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        
-        /* Estilo para a imagem */
-        .image-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .image-container img {
-            width: 50%; /* Ajuste o tamanho conforme necessário */
-            max-width: 400px; /* Tamanho máximo para a imagem */
-            height: auto;
-            border-radius: 8px; /* Opção para deixar a imagem com borda arredondada */
-        }
-
-        /* Estilo para os dados */
-        .data-table {
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-
-        .data-table th, .data-table td {
-            padding: 10px;
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
             text-align: center;
-            border: 1px solid #ddd;
         }
-
-        .data-table th {
-            background-color: #444;
-        }
-
-        .data-table td {
-            background-color: #555;
+        select, button {
+            padding: 10px;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>GERENCIAL HS</h1>
-        <a href="https://forms.gle/rgvVTs1dqfEsujzHA" class="form-link" target="_blank">CADASTRO DE FOLGAS</a>
-        <a href="https://forms.gle/wXWsukfKS2w7yKuX8" class="form-link" target="_blank">CADASTRO DE FALTA</a>
-        <a href="https://forms.gle/Wy9axrgLnoC5ymBk6" class="form-link" target="_blank">CONTAGEM DE SACOLA</a>
-        <a href="https://forms.gle/GCzCaD6iLEh9Hhhu7" class="form-link" target="_blank">DIVERGÊNCIA DE NOTAS FISCAIS</a>
-        <a href="https://forms.gle/Qp1yY1EAX1FLc7Wg9" class="form-link" target="_blank">TRANSFERÊNCIA ENTRE LOJAS</a>
-        
-        <!-- Tabela para exibir os dados -->
-        <h2>Dados da Planilha</h2>
-        <table class="data-table" id="dataTable">
-            <thead>
-                <tr>
-                    <th>Referência</th>
-                    <th>Preço Produto</th>
-                    <th>Preço na Coleção</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Os dados serão preenchidos aqui via JavaScript -->
-            </tbody>
-        </table>
+    <h1>Comparação de Preços entre Coleções</h1>
 
-        <!-- Imagem centralizada -->
-        <div class="image-container">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Logo_da_Hering.svg/1200px-Logo_da_Hering.svg.png" alt="Logo Hering">
-        </div>
+    <h2>Selecione duas coleções para comparar</h2>
+
+    <label for="colecao1">Coleção 1:</label>
+    <select id="colecao1">
+        <!-- As opções serão preenchidas dinamicamente -->
+    </select>
+
+    <label for="colecao2">Coleção 2:</label>
+    <select id="colecao2">
+        <!-- As opções serão preenchidas dinamicamente -->
+    </select>
+
+    <button onclick="compararColecoes()">Comparar</button>
+
+    <h2>Diferença de Preço</h2>
+    <div id="resultado">
+        <!-- O resultado da comparação será exibido aqui -->
     </div>
 
-    <script>
-        // URL do seu Web App
-        const url = "https://script.google.com/macros/s/1i7sFHrjxG3tZhQbN1M4AEa70ePfWXXn56UzOia-0UMrcYM81lH2Zn2fU/exec";
+    <h2>Tabelas de Preços</h2>
+    <div id="tabelas"></div>
 
-        // Função para buscar os dados do Google Sheets via Web App
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                // Preenche a tabela com os dados da planilha
-                const tableBody = document.getElementById("dataTable").getElementsByTagName("tbody")[0];
-                data.forEach(row => {
-                    const newRow = tableBody.insertRow();
-                    row.forEach(cell => {
-                        const newCell = newRow.insertCell();
-                        newCell.textContent = cell;
-                    });
-                });
-            })
-            .catch(error => {
-                console.error("Erro ao carregar os dados da planilha:", error);
+    <script>
+        // Função para criar as tabelas e popular as opções
+        const colecoes = [];
+
+        // Adicionar uma nova coleção com dados de exemplo
+        function adicionarColecao(nomeColecao, dados) {
+            colecoes.push({ nome: nomeColecao, dados: dados });
+            atualizarSelecaoColecoes();
+            criarTabela(nomeColecao, dados);
+        }
+
+        // Atualizar as opções de coleções para comparação
+        function atualizarSelecaoColecoes() {
+            const colecao1Select = document.getElementById("colecao1");
+            const colecao2Select = document.getElementById("colecao2");
+
+            colecao1Select.innerHTML = '';
+            colecao2Select.innerHTML = '';
+
+            colecoes.forEach((colecao, index) => {
+                const option1 = document.createElement("option");
+                option1.value = index;
+                option1.textContent = colecao.nome;
+                colecao1Select.appendChild(option1);
+
+                const option2 = document.createElement("option");
+                option2.value = index;
+                option2.textContent = colecao.nome;
+                colecao2Select.appendChild(option2);
             });
+        }
+
+        // Criar a tabela de preços para uma coleção
+        function criarTabela(nomeColecao, dados) {
+            let tabelaHTML = `<h3>${nomeColecao}</h3><table><thead><tr><th>Referência</th><th>Preço</th></tr></thead><tbody>`;
+            
+            dados.forEach(item => {
+                tabelaHTML += `<tr><td>${item.referencia}</td><td>${item.preco}</td></tr>`;
+            });
+
+            tabelaHTML += `</tbody></table>`;
+            document.getElementById("tabelas").innerHTML += tabelaHTML;
+        }
+
+        // Comparar os preços das duas coleções selecionadas
+        function compararColecoes() {
+            const colecao1Index = document.getElementById("colecao1").value;
+            const colecao2Index = document.getElementById("colecao2").value;
+
+            if (colecao1Index === colecao2Index) {
+                alert("Escolha duas coleções diferentes!");
+                return;
+            }
+
+            const colecao1 = colecoes[colecao1Index].dados;
+            const colecao2 = colecoes[colecao2Index].dados;
+
+            let resultadoHTML = `<h3>Diferença de Preço entre ${colecoes[colecao1Index].nome} e ${colecoes[colecao2Index].nome}</h3>`;
+            resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Diferença</th></tr></thead><tbody>`;
+
+            colecao1.forEach(item1 => {
+                const item2 = colecao2.find(item => item.referencia === item1.referencia);
+                if (item2) {
+                    const diferenca = (parseFloat(item1.preco) - parseFloat(item2.preco)).toFixed(2);
+                    resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${diferenca}</td></tr>`;
+                }
+            });
+
+            resultadoHTML += `</tbody></table>`;
+            document.getElementById("resultado").innerHTML = resultadoHTML;
+        }
+
+        // Adicionando coleções de exemplo
+        adicionarColecao("Coleção A", [
+            { referencia: "Ref1", preco: "10.00" },
+            { referencia: "Ref2", preco: "15.00" },
+            { referencia: "Ref3", preco: "20.00" }
+        ]);
+
+        adicionarColecao("Coleção B", [
+            { referencia: "Ref1", preco: "12.00" },
+            { referencia: "Ref2", preco: "14.00" },
+            { referencia: "Ref3", preco: "19.00" }
+        ]);
     </script>
 </body>
 </html>
