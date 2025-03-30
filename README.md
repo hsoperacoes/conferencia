@@ -203,7 +203,7 @@
                 }
             })
             .catch(error => {
-                console.error("Erro ao carregar os dados da planilha:", error);
+                console.error('Erro ao carregar dados:', error);
             });
     </script>
 </body>
