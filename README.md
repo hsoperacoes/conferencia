@@ -25,9 +25,6 @@
             padding: 10px;
             margin: 10px;
         }
-        #tabelas {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -46,7 +43,6 @@
     </select>
 
     <button onclick="compararColecoes()">Comparar</button>
-    <button onclick="voltarInicio()" style="display:none" id="voltarButton">Voltar ao Início</button>
 
     <h2>Diferença de Preço</h2>
     <div id="resultado">
@@ -54,11 +50,7 @@
     </div>
 
     <h2>Tabelas de Preços</h2>
-    <div id="tabelas">
-        <!-- As tabelas de preços das coleções serão exibidas aqui -->
-    </div>
-
-    <button onclick="mostrarAlterados()" style="display:none" id="alteradosButton">Mostrar Itens Alterados</button>
+    <div id="tabelas"></div>
 
     <script>
         // URL do seu Web App
@@ -92,18 +84,43 @@
                         });
                     }
 
-                    // Exibir as tabelas de preços de cada coleção
-                    function exibirTabelas() {
-                        let tabelasHTML = "";
+                    // Criar a tabela de preços para as coleções selecionadas
+                    function criarTabelaPrecoPorReferencia() {
+                        // Cabeçalho da tabela
+                        let tabelaHTML = `<h3>Tabela de Preços por Referência</h3><table><thead><tr><th>Referência</th>`;
+
+                        // Adiciona os nomes das coleções como colunas
                         colecoes.forEach(colecao => {
-                            let tabelaHTML = `<h3>${colecao.nome}</h3><table><thead><tr><th>Referência</th><th>Preço</th></tr></thead><tbody>`;
-                            colecao.dados.forEach(item => {
-                                tabelaHTML += `<tr><td>${item.referencia}</td><td>${item.preco || 'Não disponível'}</td></tr>`;
-                            });
-                            tabelaHTML += `</tbody></table>`;
-                            tabelasHTML += tabelaHTML;
+                            tabelaHTML += `<th>${colecao.nome}</th>`;
                         });
-                        document.getElementById("tabelas").innerHTML = tabelasHTML;
+
+                        tabelaHTML += `</tr></thead><tbody>`;
+
+                        // Encontra todas as referências únicas de produtos
+                        const referencias = [];
+                        colecoes.forEach(colecao => {
+                            colecao.dados.forEach(item => {
+                                if (!referencias.includes(item.referencia)) {
+                                    referencias.push(item.referencia);
+                                }
+                            });
+                        });
+
+                        // Para cada referência, exibe o preço em cada coleção
+                        referencias.forEach(referencia => {
+                            tabelaHTML += `<tr><td>${referencia}</td>`;
+
+                            colecoes.forEach(colecao => {
+                                const item = colecao.dados.find(d => d.referencia === referencia);
+                                const preco = item ? item.preco : 'Não disponível';
+                                tabelaHTML += `<td>${preco}</td>`;
+                            });
+
+                            tabelaHTML += `</tr>`;
+                        });
+
+                        tabelaHTML += `</tbody></table>`;
+                        document.getElementById("tabelas").innerHTML = tabelaHTML;
                     }
 
                     // Comparar os preços das duas coleções selecionadas
@@ -120,72 +137,25 @@
                         const colecao2 = colecoes[colecao2Index].dados;
 
                         let resultadoHTML = `<h3>Diferença de Preço entre ${colecoes[colecao1Index].nome} e ${colecoes[colecao2Index].nome}</h3>`;
-                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Maior Valor</th><th>Alteração de Preço</th></tr></thead><tbody>`;
-
-                        // Filtra e compara os preços, mostrando os maiores valores e se houve alteração de preço
-                        let alterados = [];
+                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Diferença</th></tr></thead><tbody>`;
 
                         colecao1.forEach(item1 => {
                             const item2 = colecao2.find(item => item.referencia === item1.referencia);
                             if (item2) {
-                                // Garantir que o preço seja numérico, mesmo que esteja vazio
-                                const preco1 = item1.preco ? parseFloat(item1.preco) : 0;
-                                const preco2 = item2.preco ? parseFloat(item2.preco) : 0;
-
-                                // Se o preço for válido, processa a comparação
-                                if (!isNaN(preco1) && !isNaN(preco2)) {
-                                    const maiorValor = Math.max(preco1, preco2);
-                                    const alteracao = preco1 !== preco2 ? "Sim" : "Não";
-
-                                    resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco || 'Não disponível'}</td><td>${item2.preco || 'Não disponível'}</td><td>${maiorValor}</td><td>${alteracao}</td></tr>`;
-
-                                    if (alteracao === "Sim") {
-                                        alterados.push({ referencia: item1.referencia, preco1: item1.preco, preco2: item2.preco });
-                                    }
-                                }
+                                const diferenca = (parseFloat(item1.preco) - parseFloat(item2.preco)).toFixed(2);
+                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${diferenca}</td></tr>`;
                             }
                         });
 
                         resultadoHTML += `</tbody></table>`;
                         document.getElementById("resultado").innerHTML = resultadoHTML;
-
-                        // Exibe o botão para mostrar apenas os itens alterados
-                        document.getElementById("alteradosButton").style.display = "inline-block";
-
-                        // Armazena os itens alterados para filtrar depois
-                        window.itensAlterados = alterados;
-
-                        // Exibe os dados da comparação
-                        document.getElementById("tabelas").style.display = "block";
-                        document.getElementById("voltarButton").style.display = "inline-block";
-                    }
-
-                    // Mostrar apenas itens com alteração de preço
-                    function mostrarAlterados() {
-                        let resultadoHTML = `<h3>Itens com Alteração de Preço</h3>`;
-                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th></tr></thead><tbody>`;
-
-                        window.itensAlterados.forEach(item => {
-                            resultadoHTML += `<tr><td>${item.referencia}</td><td>${item.preco1}</td><td>${item.preco2}</td></tr>`;
-                        });
-
-                        resultadoHTML += `</tbody></table>`;
-                        document.getElementById("resultado").innerHTML = resultadoHTML;
-                    }
-
-                    // Função para voltar ao início
-                    function voltarInicio() {
-                        document.getElementById("resultado").innerHTML = "";
-                        document.getElementById("tabelas").style.display = "none";
-                        document.getElementById("voltarButton").style.display = "none";
-                        document.getElementById("alteradosButton").style.display = "none";
                     }
 
                     // Chama a função para atualizar as seleções das coleções
                     atualizarSelecaoColecoes();
 
-                    // Exibir as tabelas de preços ao carregar
-                    exibirTabelas();
+                    // Cria a tabela de preços por referência
+                    criarTabelaPrecoPorReferencia();
                 } else {
                     console.error("Não há dados ou os dados estão em formato inesperado.");
                 }
