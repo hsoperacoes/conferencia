@@ -60,78 +60,80 @@
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                // Preencher as coleções dinamicamente
-                const colecoes = data; // Dados da planilha do Google
+                if (data && data.length) {
+                    const colecoes = data; // Dados da planilha do Google
 
-                // Atualizar as opções de coleções para comparação
-                function atualizarSelecaoColecoes() {
-                    const colecao1Select = document.getElementById("colecao1");
-                    const colecao2Select = document.getElementById("colecao2");
+                    // Atualizar as opções de coleções para comparação
+                    function atualizarSelecaoColecoes() {
+                        const colecao1Select = document.getElementById("colecao1");
+                        const colecao2Select = document.getElementById("colecao2");
 
-                    colecao1Select.innerHTML = '';
-                    colecao2Select.innerHTML = '';
+                        colecao1Select.innerHTML = '';
+                        colecao2Select.innerHTML = '';
 
-                    colecoes.forEach((colecao, index) => {
-                        const option1 = document.createElement("option");
-                        option1.value = index;
-                        option1.textContent = colecao.nome;
-                        colecao1Select.appendChild(option1);
+                        colecoes.forEach((colecao, index) => {
+                            const option1 = document.createElement("option");
+                            option1.value = index;
+                            option1.textContent = colecao.nome;
+                            colecao1Select.appendChild(option1);
 
-                        const option2 = document.createElement("option");
-                        option2.value = index;
-                        option2.textContent = colecao.nome;
-                        colecao2Select.appendChild(option2);
-                    });
-                }
-
-                // Criar a tabela de preços para uma coleção
-                function criarTabela(nomeColecao, dados) {
-                    let tabelaHTML = `<h3>${nomeColecao}</h3><table><thead><tr><th>Referência</th><th>Preço</th></tr></thead><tbody>`;
-                    
-                    dados.forEach(item => {
-                        tabelaHTML += `<tr><td>${item.referencia}</td><td>${item.preco}</td></tr>`;
-                    });
-
-                    tabelaHTML += `</tbody></table>`;
-                    document.getElementById("tabelas").innerHTML += tabelaHTML;
-                }
-
-                // Comparar os preços das duas coleções selecionadas
-                function compararColecoes() {
-                    const colecao1Index = document.getElementById("colecao1").value;
-                    const colecao2Index = document.getElementById("colecao2").value;
-
-                    if (colecao1Index === colecao2Index) {
-                        alert("Escolha duas coleções diferentes!");
-                        return;
+                            const option2 = document.createElement("option");
+                            option2.value = index;
+                            option2.textContent = colecao.nome;
+                            colecao2Select.appendChild(option2);
+                        });
                     }
 
-                    const colecao1 = colecoes[colecao1Index].dados;
-                    const colecao2 = colecoes[colecao2Index].dados;
+                    // Criar a tabela de preços para uma coleção
+                    function criarTabela(nomeColecao, dados) {
+                        let tabelaHTML = `<h3>${nomeColecao}</h3><table><thead><tr><th>Referência</th><th>Preço</th></tr></thead><tbody>`;
+                        
+                        dados.forEach(item => {
+                            tabelaHTML += `<tr><td>${item.referencia}</td><td>${item.preco}</td></tr>`;
+                        });
 
-                    let resultadoHTML = `<h3>Diferença de Preço entre ${colecoes[colecao1Index].nome} e ${colecoes[colecao2Index].nome}</h3>`;
-                    resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Diferença</th></tr></thead><tbody>`;
+                        tabelaHTML += `</tbody></table>`;
+                        document.getElementById("tabelas").innerHTML += tabelaHTML;
+                    }
 
-                    colecao1.forEach(item1 => {
-                        const item2 = colecao2.find(item => item.referencia === item1.referencia);
-                        if (item2) {
-                            const diferenca = (parseFloat(item1.preco) - parseFloat(item2.preco)).toFixed(2);
-                            resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${diferenca}</td></tr>`;
+                    // Comparar os preços das duas coleções selecionadas
+                    function compararColecoes() {
+                        const colecao1Index = document.getElementById("colecao1").value;
+                        const colecao2Index = document.getElementById("colecao2").value;
+
+                        if (colecao1Index === colecao2Index) {
+                            alert("Escolha duas coleções diferentes!");
+                            return;
                         }
+
+                        const colecao1 = colecoes[colecao1Index].dados;
+                        const colecao2 = colecoes[colecao2Index].dados;
+
+                        let resultadoHTML = `<h3>Diferença de Preço entre ${colecoes[colecao1Index].nome} e ${colecoes[colecao2Index].nome}</h3>`;
+                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Diferença</th></tr></thead><tbody>`;
+
+                        colecao1.forEach(item1 => {
+                            const item2 = colecao2.find(item => item.referencia === item1.referencia);
+                            if (item2) {
+                                const diferenca = (parseFloat(item1.preco) - parseFloat(item2.preco)).toFixed(2);
+                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${diferenca}</td></tr>`;
+                            }
+                        });
+
+                        resultadoHTML += `</tbody></table>`;
+                        document.getElementById("resultado").innerHTML = resultadoHTML;
+                    }
+
+                    // Chama a função para atualizar as seleções das coleções
+                    atualizarSelecaoColecoes();
+
+                    // Cria as tabelas de cada coleção
+                    colecoes.forEach(colecao => {
+                        criarTabela(colecao.nome, colecao.dados);
                     });
-
-                    resultadoHTML += `</tbody></table>`;
-                    document.getElementById("resultado").innerHTML = resultadoHTML;
+                } else {
+                    console.error("Não há dados ou os dados estão em formato inesperado.");
                 }
-
-                // Chama a função para atualizar as seleções das coleções
-                atualizarSelecaoColecoes();
-
-                // Cria as tabelas de cada coleção
-                colecoes.forEach(colecao => {
-                    criarTabela(colecao.nome, colecao.dados);
-                });
-
             })
             .catch(error => {
                 console.error("Erro ao carregar os dados da planilha:", error);
