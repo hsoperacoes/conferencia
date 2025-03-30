@@ -44,6 +44,9 @@
 
     <button onclick="compararColecoes()">Comparar</button>
 
+    <button onclick="mostrarAlteracao()">Mostrar Alteração de Preço</button>
+    <button onclick="voltarInicio()">Voltar ao Início</button>
+
     <h2>Diferença de Preço</h2>
     <div id="resultado">
         <!-- O resultado da comparação será exibido aqui -->
@@ -84,7 +87,7 @@
                         });
                     }
 
-                    // Criar a tabela de preços para as coleções selecionadas
+                    // Criar a tabela de preços por referência
                     function criarTabelaPrecoPorReferencia() {
                         // Cabeçalho da tabela
                         let tabelaHTML = `<h3>Tabela de Preços por Referência</h3><table><thead><tr><th>Referência</th>`;
@@ -112,7 +115,7 @@
 
                             colecoes.forEach(colecao => {
                                 const item = colecao.dados.find(d => d.referencia === referencia);
-                                const preco = item ? item.preco : '0'; // Substitui "Não disponível" por "0"
+                                const preco = item ? item.preco : '0';  // Substitui "Não disponível" por 0
                                 tabelaHTML += `<td>${preco}</td>`;
                             });
 
@@ -137,21 +140,57 @@
                         const colecao2 = colecoes[colecao2Index].dados;
 
                         let resultadoHTML = `<h3>Diferença de Preço entre ${colecoes[colecao1Index].nome} e ${colecoes[colecao2Index].nome}</h3>`;
-                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Diferença</th></tr></thead><tbody>`;
+                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Maior Preço</th><th>Alteração de Preço</th></tr></thead><tbody>`;
 
                         colecao1.forEach(item1 => {
                             const item2 = colecao2.find(item => item.referencia === item1.referencia);
                             if (item2) {
-                                // Substitui "Não disponível" por 0 antes de calcular a diferença
-                                const preco1 = item1.preco ? parseFloat(item1.preco) : 0;
-                                const preco2 = item2.preco ? parseFloat(item2.preco) : 0;
-                                const diferenca = (preco1 - preco2).toFixed(2);
-                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${preco1}</td><td>${preco2}</td><td>${diferenca}</td></tr>`;
+                                const preco1 = parseFloat(item1.preco) || 0;
+                                const preco2 = parseFloat(item2.preco) || 0;
+                                const maiorPreco = Math.max(preco1, preco2).toFixed(2);
+                                const alteracao = preco1 !== preco2 ? 'Sim' : 'Não';
+
+                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${maiorPreco}</td><td>${alteracao}</td></tr>`;
                             }
                         });
 
                         resultadoHTML += `</tbody></table>`;
                         document.getElementById("resultado").innerHTML = resultadoHTML;
+                    }
+
+                    // Filtrar para mostrar apenas itens com alteração de preço
+                    function mostrarAlteracao() {
+                        const colecao1Index = document.getElementById("colecao1").value;
+                        const colecao2Index = document.getElementById("colecao2").value;
+
+                        const colecao1 = colecoes[colecao1Index].dados;
+                        const colecao2 = colecoes[colecao2Index].dados;
+
+                        let resultadoHTML = `<h3>Itens com Alteração de Preço</h3>`;
+                        resultadoHTML += `<table><thead><tr><th>Referência</th><th>Preço Coleção 1</th><th>Preço Coleção 2</th><th>Maior Preço</th><th>Alteração de Preço</th></tr></thead><tbody>`;
+
+                        colecao1.forEach(item1 => {
+                            const item2 = colecao2.find(item => item.referencia === item1.referencia);
+                            if (item2) {
+                                const preco1 = parseFloat(item1.preco) || 0;
+                                const preco2 = parseFloat(item2.preco) || 0;
+                                if (preco1 !== preco2) {
+                                    const maiorPreco = Math.max(preco1, preco2).toFixed(2);
+                                    resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${maiorPreco}</td><td>Sim</td></tr>`;
+                                }
+                            }
+                        });
+
+                        resultadoHTML += `</tbody></table>`;
+                        document.getElementById("resultado").innerHTML = resultadoHTML;
+                    }
+
+                    // Voltar para o início
+                    function voltarInicio() {
+                        document.getElementById("resultado").innerHTML = '';
+                        document.getElementById("tabelas").innerHTML = '';
+                        document.getElementById("colecao1").value = '';
+                        document.getElementById("colecao2").value = '';
                     }
 
                     // Chama a função para atualizar as seleções das coleções
