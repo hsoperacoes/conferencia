@@ -112,16 +112,20 @@
                         colecao1.forEach(item1 => {
                             const item2 = colecao2.find(item => item.referencia === item1.referencia);
                             if (item2) {
-                                const preco1 = parseFloat(item1.preco) || 0;
-                                const preco2 = parseFloat(item2.preco) || 0;
+                                // Garantir que o preço seja numérico, mesmo que esteja vazio
+                                const preco1 = item1.preco ? parseFloat(item1.preco) : 0;
+                                const preco2 = item2.preco ? parseFloat(item2.preco) : 0;
 
-                                const maiorValor = Math.max(preco1, preco2);
-                                const alteracao = preco1 !== preco2 ? "Sim" : "Não";
+                                // Se o preço for válido, processa a comparação
+                                if (!isNaN(preco1) && !isNaN(preco2)) {
+                                    const maiorValor = Math.max(preco1, preco2);
+                                    const alteracao = preco1 !== preco2 ? "Sim" : "Não";
 
-                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${maiorValor}</td><td>${alteracao}</td></tr>`;
+                                    resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco || 'Não disponível'}</td><td>${item2.preco || 'Não disponível'}</td><td>${maiorValor}</td><td>${alteracao}</td></tr>`;
 
-                                if (alteracao === "Sim") {
-                                    alterados.push({ referencia: item1.referencia, preco1: item1.preco, preco2: item2.preco });
+                                    if (alteracao === "Sim") {
+                                        alterados.push({ referencia: item1.referencia, preco1: item1.preco, preco2: item2.preco });
+                                    }
                                 }
                             }
                         });
