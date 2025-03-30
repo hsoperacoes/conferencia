@@ -112,7 +112,7 @@
 
                             colecoes.forEach(colecao => {
                                 const item = colecao.dados.find(d => d.referencia === referencia);
-                                const preco = item ? item.preco : 'Não disponível';
+                                const preco = item ? item.preco : '0'; // Substitui "Não disponível" por "0"
                                 tabelaHTML += `<td>${preco}</td>`;
                             });
 
@@ -142,8 +142,11 @@
                         colecao1.forEach(item1 => {
                             const item2 = colecao2.find(item => item.referencia === item1.referencia);
                             if (item2) {
-                                const diferenca = (parseFloat(item1.preco) - parseFloat(item2.preco)).toFixed(2);
-                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${item1.preco}</td><td>${item2.preco}</td><td>${diferenca}</td></tr>`;
+                                // Substitui "Não disponível" por 0 antes de calcular a diferença
+                                const preco1 = item1.preco ? parseFloat(item1.preco) : 0;
+                                const preco2 = item2.preco ? parseFloat(item2.preco) : 0;
+                                const diferenca = (preco1 - preco2).toFixed(2);
+                                resultadoHTML += `<tr><td>${item1.referencia}</td><td>${preco1}</td><td>${preco2}</td><td>${diferenca}</td></tr>`;
                             }
                         });
 
