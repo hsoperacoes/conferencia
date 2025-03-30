@@ -54,7 +54,9 @@
     </div>
 
     <h2>Tabelas de Preços</h2>
-    <div id="tabelas"></div>
+    <div id="tabelas">
+        <!-- As tabelas de preços das coleções serão exibidas aqui -->
+    </div>
 
     <button onclick="mostrarAlterados()" style="display:none" id="alteradosButton">Mostrar Itens Alterados</button>
 
@@ -88,6 +90,20 @@
                             option2.textContent = colecao.nome;
                             colecao2Select.appendChild(option2);
                         });
+                    }
+
+                    // Exibir as tabelas de preços de cada coleção
+                    function exibirTabelas() {
+                        let tabelasHTML = "";
+                        colecoes.forEach(colecao => {
+                            let tabelaHTML = `<h3>${colecao.nome}</h3><table><thead><tr><th>Referência</th><th>Preço</th></tr></thead><tbody>`;
+                            colecao.dados.forEach(item => {
+                                tabelaHTML += `<tr><td>${item.referencia}</td><td>${item.preco || 'Não disponível'}</td></tr>`;
+                            });
+                            tabelaHTML += `</tbody></table>`;
+                            tabelasHTML += tabelaHTML;
+                        });
+                        document.getElementById("tabelas").innerHTML = tabelasHTML;
                     }
 
                     // Comparar os preços das duas coleções selecionadas
@@ -167,6 +183,9 @@
 
                     // Chama a função para atualizar as seleções das coleções
                     atualizarSelecaoColecoes();
+
+                    // Exibir as tabelas de preços ao carregar
+                    exibirTabelas();
                 } else {
                     console.error("Não há dados ou os dados estão em formato inesperado.");
                 }
