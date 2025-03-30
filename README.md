@@ -45,7 +45,7 @@
 
     <button onclick="filtrarAlteracao()">Mostrar Itens com Alteração de Preço</button>
 
-    <h2>Tabelas de Preços</h2>
+    <h2>Tabela de Preços</h2>
     <div id="tabelas"></div>
 
     <script>
@@ -145,23 +145,24 @@
         }
 
         function criarTabela() {
-            let tabelasHTML = '';
+            let tabelaHTML = '<table><thead><tr><th>Referência</th>';
             colecoes.forEach(colecao => {
-                let tabelaHTML = `<h3>${colecao.nome}</h3><table><thead><tr><th>Referência</th>`;
-                colecoes.forEach(c => tabelaHTML += `<th>${c.nome}</th>`);
-                tabelaHTML += `</tr></thead><tbody>`;
-                colecao.dados.forEach(item => {
-                    tabelaHTML += `<tr><td>${item.referencia}</td>`;
-                    colecoes.forEach(c => {
-                        const preco = c.dados.find(d => d.referencia === item.referencia)?.preco || "0,00";
-                        tabelaHTML += `<td>${preco}</td>`;
-                    });
-                    tabelaHTML += `</tr>`;
-                });
-                tabelaHTML += `</tbody></table>`;
-                tabelasHTML += tabelaHTML;
+                tabelaHTML += `<th>${colecao.nome}</th>`;
             });
-            document.getElementById("tabelas").innerHTML = tabelasHTML;
+            tabelaHTML += '</tr></thead><tbody>';
+
+            const referencias = [...new Set(colecoes.flatMap(c => c.dados.map(d => d.referencia)))];
+            referencias.forEach(referencia => {
+                tabelaHTML += `<tr><td>${referencia}</td>`;
+                colecoes.forEach(colecao => {
+                    const item = colecao.dados.find(d => d.referencia === referencia);
+                    tabelaHTML += `<td>${item ? item.preco : "0,00"}</td>`;
+                });
+                tabelaHTML += '</tr>';
+            });
+
+            tabelaHTML += '</tbody></table>';
+            document.getElementById("tabelas").innerHTML = tabelaHTML;
         }
 
         function compararColecoes() {
@@ -198,11 +199,6 @@
         function filtrarAlteracao() {
             const colecao1Index = document.getElementById("colecao1").value;
             const colecao2Index = document.getElementById("colecao2").value;
-
-            if (colecao1Index === colecao2Index) {
-                alert("Escolha duas coleções diferentes!");
-                return;
-            }
 
             const colecao1 = colecoes[colecao1Index].dados;
             const colecao2 = colecoes[colecao2Index].dados;
