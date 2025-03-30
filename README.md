@@ -84,16 +84,43 @@
                         });
                     }
 
-                    // Criar a tabela de preços para uma coleção
-                    function criarTabela(nomeColecao, dados) {
-                        let tabelaHTML = `<h3>${nomeColecao}</h3><table><thead><tr><th>Referência</th><th>Preço</th></tr></thead><tbody>`;
-                        
-                        dados.forEach(item => {
-                            tabelaHTML += `<tr><td>${item.referencia}</td><td>${item.preco}</td></tr>`;
+                    // Criar a tabela de preços para as coleções selecionadas
+                    function criarTabelaPrecoPorReferencia() {
+                        // Cabeçalho da tabela
+                        let tabelaHTML = `<h3>Tabela de Preços por Referência</h3><table><thead><tr><th>Referência</th>`;
+
+                        // Adiciona os nomes das coleções como colunas
+                        colecoes.forEach(colecao => {
+                            tabelaHTML += `<th>${colecao.nome}</th>`;
+                        });
+
+                        tabelaHTML += `</tr></thead><tbody>`;
+
+                        // Encontra todas as referências únicas de produtos
+                        const referencias = [];
+                        colecoes.forEach(colecao => {
+                            colecao.dados.forEach(item => {
+                                if (!referencias.includes(item.referencia)) {
+                                    referencias.push(item.referencia);
+                                }
+                            });
+                        });
+
+                        // Para cada referência, exibe o preço em cada coleção
+                        referencias.forEach(referencia => {
+                            tabelaHTML += `<tr><td>${referencia}</td>`;
+
+                            colecoes.forEach(colecao => {
+                                const item = colecao.dados.find(d => d.referencia === referencia);
+                                const preco = item ? item.preco : 'Não disponível';
+                                tabelaHTML += `<td>${preco}</td>`;
+                            });
+
+                            tabelaHTML += `</tr>`;
                         });
 
                         tabelaHTML += `</tbody></table>`;
-                        document.getElementById("tabelas").innerHTML += tabelaHTML;
+                        document.getElementById("tabelas").innerHTML = tabelaHTML;
                     }
 
                     // Comparar os preços das duas coleções selecionadas
@@ -127,10 +154,8 @@
                     // Chama a função para atualizar as seleções das coleções
                     atualizarSelecaoColecoes();
 
-                    // Cria as tabelas de cada coleção
-                    colecoes.forEach(colecao => {
-                        criarTabela(colecao.nome, colecao.dados);
-                    });
+                    // Cria a tabela de preços por referência
+                    criarTabelaPrecoPorReferencia();
                 } else {
                     console.error("Não há dados ou os dados estão em formato inesperado.");
                 }
