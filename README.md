@@ -54,7 +54,7 @@
 
     <script>
         // URL do seu Web App
-        const url = "https://script.google.com/macros/s/1i7sFHrjxG3tZhQbN1M4AEa70ePfWXXn56UzOia-0UMrcYM81lH2Zn2fU/exec";
+        const url = "https://script.google.com/macros/s/AKfycbz3YS7AFhRjA9QX8I2v05_5NCo8D-R5RlR7AnZAmz9QMknX4auK0kWOInwPtSPpOVv6FA/exec";
 
         // Função para buscar os dados do Google Sheets via Web App
         fetch(url)
